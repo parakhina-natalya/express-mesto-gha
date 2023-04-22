@@ -70,7 +70,7 @@ const updateUserInfo = (req, res) => {
       res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         res.status(badRequest).send({ message: 'Переданы некорректные данные' });
         return;
       }
@@ -95,10 +95,10 @@ const updateUserAvatar = (req, res) => {
       throw err;
     })
     .then((user) => {
-      res.status(200).send(user.avatar);
+      res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         res.status(badRequest).send({ message: 'Переданы некорректные данные' });
         return;
       }
