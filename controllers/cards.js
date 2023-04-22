@@ -59,7 +59,7 @@ const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true },
+    { new: true, runValidators: true },
   )
     .orFail(() => {
       const err = new Error({ message: 'Карточка не найдена' });
@@ -87,7 +87,7 @@ const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
-    { new: true },
+    { new: true, runValidators: true },
   )
     .orFail(() => {
       const err = new Error({ message: 'Карточка не найдена' });

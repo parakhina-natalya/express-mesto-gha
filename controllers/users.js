@@ -58,7 +58,7 @@ const updateUserInfo = (req, res) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(req.user._id, { name, about }, {
-    new: true,
+    new: true, runValidators: true,
   })
     .orFail(() => {
       const err = new Error({ message: 'Пользователь не существует' });
@@ -70,8 +70,8 @@ const updateUserInfo = (req, res) => {
       res.status(200).send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(badRequest).send({ message: 'Переданы некорректные данные при обновлении информации о пользователе' });
+      if (err.name === 'CastError') {
+        res.status(badRequest).send({ message: 'Переданы некорректные данные' });
         return;
       }
       if (err.name === 'NotFound') {
@@ -86,7 +86,7 @@ const updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(req.user._id, { avatar }, {
-    new: true,
+    new: true, runValidators: true,
   })
     .orFail(() => {
       const err = new Error({ message: 'Пользователь не существует' });
@@ -98,8 +98,8 @@ const updateUserAvatar = (req, res) => {
       res.status(200).send(user.avatar);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(badRequest).send({ message: 'Переданы некорректные данные при обновлении аватара' });
+      if (err.name === 'CastError') {
+        res.status(badRequest).send({ message: 'Переданы некорректные данные' });
         return;
       }
       if (err.name === 'NotFound') {
