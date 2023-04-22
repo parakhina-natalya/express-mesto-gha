@@ -4,10 +4,9 @@ const bodyParser = require('body-parser');
 const router = require('./routes/index');
 
 const app = express();
+
 mongoose.connect('mongodb://127.0.0.1/mestodb')
-  // eslint-disable-next-line no-console
   .then(() => console.log('Успешное подключение к MongoDB'))
-  // eslint-disable-next-line no-console
   .catch((err) => console.error('Ошибка подключения:', err));
 
 app.use(bodyParser.json());
@@ -23,6 +22,5 @@ app.use((req, res, next) => {
 app.use(router);
 
 app.listen(3000, () => {
-  // eslint-disable-next-line no-console
   console.log('start server');
 });

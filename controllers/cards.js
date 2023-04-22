@@ -24,7 +24,7 @@ const createCard = (req, res) => {
 const getCards = (req, res) => {
   Card.find()
     .then((cards) => {
-      res.status(201).send(cards);
+      res.status(200).send(cards);
     })
     .catch(() => {
       res.status(serverError).send({ message: 'На сервере произошла ошибка' });
@@ -40,7 +40,7 @@ const removeCardById = (req, res) => {
       throw err;
     })
     .then(() => {
-      res.status(201).send();
+      res.status(200).send({ message: 'Карточка удалена' });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -67,8 +67,8 @@ const likeCard = (req, res) => {
       err.name = 'NotFound';
       throw err;
     })
-    .then(() => {
-      res.status(201).send();
+    .then((card) => {
+      res.status(201).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -95,8 +95,8 @@ const dislikeCard = (req, res) => {
       err.name = 'NotFound';
       throw err;
     })
-    .then(() => {
-      res.status(201).send();
+    .then((card) => {
+      res.status(200).send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {

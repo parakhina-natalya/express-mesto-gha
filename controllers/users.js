@@ -23,7 +23,7 @@ const createUser = (req, res) => {
 const getUsers = (req, res) => {
   User.find()
     .then((users) => {
-      res.status(201).send(users);
+      res.status(200).send(users);
     })
     .catch(() => {
       res.status(serverError).send({ message: 'На сервере произошла ошибка' });
@@ -39,7 +39,7 @@ const getUserById = (req, res) => {
       throw err;
     })
     .then((user) => {
-      res.status(201).send(user);
+      res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -60,13 +60,22 @@ const updateUserInfo = (req, res) => {
   User.findByIdAndUpdate(req.user._id, { name, about }, {
     new: true,
   })
-
+    .orFail(() => {
+      const err = new Error({ message: 'Пользователь не существует' });
+      err.statusCode = notFound;
+      err.name = 'NotFound';
+      throw err;
+    })
     .then((user) => {
-      res.status(201).send(user);
+      res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(badRequest).send({ message: 'Переданы некорректные данные при обновлении информации о пользователе' });
+        return;
+      }
+      if (err.name === 'NotFound') {
+        res.status(notFound).send({ message: 'Пользователь не существует' });
         return;
       }
       res.status(serverError).send({ message: 'На сервере произошла ошибка' });
@@ -79,12 +88,22 @@ const updateUserAvatar = (req, res) => {
   User.findByIdAndUpdate(req.user._id, { avatar }, {
     new: true,
   })
+    .orFail(() => {
+      const err = new Error({ message: 'Пользователь не существует' });
+      err.statusCode = notFound;
+      err.name = 'NotFound';
+      throw err;
+    })
     .then((user) => {
-      res.status(201).send(user.avatar);
+      res.status(200).send(user.avatar);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(badRequest).send({ message: 'Переданы некорректные данные при обновлении аватара' });
+        return;
+      }
+      if (err.name === 'NotFound') {
+        res.status(notFound).send({ message: 'Пользователь не существует' });
         return;
       }
       res.status(serverError).send({ message: 'На сервере произошла ошибка' });
