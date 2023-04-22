@@ -1,6 +1,10 @@
 [![Tests](../../actions/workflows/tests-13-sprint.yml/badge.svg)](../../actions/workflows/tests-13-sprint.yml) [![Tests](../../actions/workflows/tests-14-sprint.yml/badge.svg)](../../actions/workflows/tests-14-sprint.yml)
 # Проект Mesto фронтенд + бэкенд
 
+Основная часть бэкенда для приложения Mesto. 
+
+## Cсылка на репозитарий
+https://github.com/parakhina-natalya/express-mesto-gha
 
 ## Директории
 
@@ -14,3 +18,15 @@
 
 `npm run start` — запускает сервер   
 `npm run dev` — запускает сервер с hot-reload
+
+## Используемые технологии
+ESLint
+Node.js
+express.js
+MongoDB
+Postman
+Обработка ошибок
+
+## Планы на будущее
+
+Написать взаимодействие с фронтенд частью, добавить авторизацию и регистрацию.
