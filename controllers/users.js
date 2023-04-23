@@ -1,5 +1,6 @@
 const User = require('../models/user');
 
+const created = 201;
 const badRequest = 400;
 const notFound = 404;
 const serverError = 500;
@@ -9,7 +10,7 @@ const createUser = (req, res) => {
 
   User.create({ name, about, avatar })
     .then((newUser) => {
-      res.status(201).send(newUser);
+      res.status(created).send(newUser);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -23,7 +24,7 @@ const createUser = (req, res) => {
 const getUsers = (req, res) => {
   User.find()
     .then((users) => {
-      res.status(200).send(users);
+      res.send(users);
     })
     .catch(() => {
       res.status(serverError).send({ message: 'На сервере произошла ошибка' });
@@ -39,7 +40,7 @@ const getUserById = (req, res) => {
       throw err;
     })
     .then((user) => {
-      res.status(200).send(user);
+      res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -47,7 +48,7 @@ const getUserById = (req, res) => {
         return;
       }
       if (err.name === 'NotFound') {
-        res.status(notFound).send({ message: 'Пользователь не существует' });
+        res.status(notFound).send({ message: err.message });
         return;
       }
       res.status(serverError).send({ message: 'На сервере произошла ошибка' });
@@ -67,15 +68,19 @@ const updateUserInfo = (req, res) => {
       throw err;
     })
     .then((user) => {
-      res.status(200).send(user);
+      res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(badRequest).send({ message: 'Переданы некорректные данные' });
         return;
       }
+      if (err.name === 'CastError') {
+        res.status(badRequest).send({ message: 'Переданы некорректные данные' });
+        return;
+      }
       if (err.name === 'NotFound') {
-        res.status(notFound).send({ message: 'Пользователь не существует' });
+        res.status(notFound).send({ message: err.message });
         return;
       }
       res.status(serverError).send({ message: 'На сервере произошла ошибка' });
@@ -95,15 +100,19 @@ const updateUserAvatar = (req, res) => {
       throw err;
     })
     .then((user) => {
-      res.status(200).send(user);
+      res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(badRequest).send({ message: 'Переданы некорректные данные' });
         return;
       }
+      if (err.name === 'CastError') {
+        res.status(badRequest).send({ message: 'Переданы некорректные данные' });
+        return;
+      }
       if (err.name === 'NotFound') {
-        res.status(notFound).send({ message: 'Пользователь не существует' });
+        res.status(notFound).send({ message: err.message });
         return;
       }
       res.status(serverError).send({ message: 'На сервере произошла ошибка' });

@@ -1,5 +1,6 @@
 const Card = require('../models/card');
 
+const created = 201;
 const badRequest = 400;
 const notFound = 404;
 const serverError = 500;
@@ -10,7 +11,7 @@ const createCard = (req, res) => {
 
   Card.create({ name, link, owner })
     .then((newCard) => {
-      res.status(201).send(newCard);
+      res.status(created).send(newCard);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -24,7 +25,7 @@ const createCard = (req, res) => {
 const getCards = (req, res) => {
   Card.find()
     .then((cards) => {
-      res.status(200).send(cards);
+      res.send(cards);
     })
     .catch(() => {
       res.status(serverError).send({ message: 'На сервере произошла ошибка' });
@@ -40,7 +41,7 @@ const removeCardById = (req, res) => {
       throw err;
     })
     .then(() => {
-      res.status(200).send({ message: 'Карточка удалена' });
+      res.send({ message: 'Карточка удалена' });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -48,7 +49,7 @@ const removeCardById = (req, res) => {
         return;
       }
       if (err.name === 'NotFound') {
-        res.status(notFound).send({ message: 'Карточка не найдена' });
+        res.status(notFound).send({ message: err.message });
         return;
       }
       res.status(serverError).send({ message: 'На сервере произошла ошибка' });
@@ -68,7 +69,7 @@ const likeCard = (req, res) => {
       throw err;
     })
     .then((card) => {
-      res.status(201).send(card);
+      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -76,7 +77,7 @@ const likeCard = (req, res) => {
         return;
       }
       if (err.name === 'NotFound') {
-        res.status(notFound).send({ message: 'Карточка не найдена' });
+        res.status(notFound).send({ message: err.message });
         return;
       }
       res.status(serverError).send({ message: 'На сервере произошла ошибка' });
@@ -96,7 +97,7 @@ const dislikeCard = (req, res) => {
       throw err;
     })
     .then((card) => {
-      res.status(200).send(card);
+      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -104,7 +105,7 @@ const dislikeCard = (req, res) => {
         return;
       }
       if (err.name === 'NotFound') {
-        res.status(notFound).send({ message: 'Карточка не найдена' });
+        res.status(notFound).send({ message: err.message });
         return;
       }
       res.status(serverError).send({ message: 'На сервере произошла ошибка' });
