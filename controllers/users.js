@@ -5,6 +5,7 @@ const User = require('../models/user');
 const ValidationError = require('../utils/errors/validation');
 const NotFoundError = require('../utils/errors/notFound');
 const ConflictingRequest = require('../utils/errors/conflictingRequest');
+const UnauthorizedError = require('../utils/errors/unauthorized');
 
 const createUser = (req, res, next) => {
   const {
@@ -16,7 +17,13 @@ const createUser = (req, res, next) => {
       name, about, avatar, email, password: hash,
     }))
     .then((newUser) => {
-      res.status(201).send(newUser);
+      res.status(201).send({
+        _id: newUser._id,
+        name: newUser.name,
+        about: newUser.about,
+        avatar: newUser.avatar,
+        email: newUser.email,
+      });
     })
     .catch((err) => {
       if (err.code === 11000) {
@@ -35,11 +42,11 @@ const login = (req, res, next) => {
   User.findOne({ email }).select('+password')
     .then(async (user) => {
       if (!user) {
-        throw new NotFoundError('Неправильные почта или пароль');
+        throw new UnauthorizedError('Неправильные почта или пароль');
       }
       const matched = await bcrypt.compare(password, user.password);
       if (!matched) {
-        throw new NotFoundError('Неправильные почта или пароль');
+        throw new UnauthorizedError('Неправильные почта или пароль');
       }
       return user;
     })
