@@ -1,114 +1,94 @@
 const Card = require('../models/card');
 
-const created = 201;
-const badRequest = 400;
-const notFound = 404;
-const serverError = 500;
+const ValidationError = require('../utils/errors/validation');
+const NotFoundError = require('../utils/errors/notFound');
+const ForbiddenError = require('../utils/errors/forbidden');
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
 
   Card.create({ name, link, owner })
     .then((newCard) => {
-      res.status(created).send(newCard);
+      res.status(201).send(newCard);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(badRequest).send({ message: 'Переданы некорректные данные при создании карточки' });
-        return;
+        next(new ValidationError('Переданы некорректные данные при создании карточки'));
       }
-      res.status(serverError).send({ message: 'На сервере произошла ошибка' });
+      next(err);
     });
 };
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find()
     .then((cards) => {
       res.send(cards);
     })
-    .catch(() => {
-      res.status(serverError).send({ message: 'На сервере произошла ошибка' });
-    });
+    .catch(next);
 };
 
-const removeCardById = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+const removeCardById = (req, res, next) => {
+  Card.findById(req.params.cardId)
     .orFail(() => {
-      const err = new Error({ message: 'Карточка не найдена' });
-      err.statusCode = notFound;
-      err.name = 'NotFound';
-      throw err;
+      throw new NotFoundError('Карточка не найдена');
     })
-    .then(() => {
-      res.send({ message: 'Карточка удалена' });
+    .then((card) => {
+      if (JSON.stringify(card.owner) !== JSON.stringify(req.user._id)) {
+        throw new ForbiddenError('Нельзя удалять чужие карточки');
+      } else {
+        Card.findByIdAndRemove(req.params.cardId)
+          .then(() => {
+            res.send({ message: 'Карточка удалена.' });
+          })
+          .catch(next);
+      }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(badRequest).send({ message: 'Переданы некорректные данные карточки' });
-        return;
+        next(new ValidationError('Переданы некорректные данныe'));
       }
-      if (err.name === 'NotFound') {
-        res.status(notFound).send({ message: err.message });
-        return;
-      }
-      res.status(serverError).send({ message: 'На сервере произошла ошибка' });
+      next(err);
     });
 };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true, runValidators: true },
   )
     .orFail(() => {
-      const err = new Error({ message: 'Карточка не найдена' });
-      err.statusCode = notFound;
-      err.name = 'NotFound';
-      throw err;
+      throw new NotFoundError('Карточка не найдена');
     })
     .then((card) => {
       res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(badRequest).send({ message: 'Переданы некорректные данные карточки' });
-        return;
+        next(new ValidationError('Переданы некорректные данныe'));
       }
-      if (err.name === 'NotFound') {
-        res.status(notFound).send({ message: err.message });
-        return;
-      }
-      res.status(serverError).send({ message: 'На сервере произошла ошибка' });
+      next(err);
     });
 };
 
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true, runValidators: true },
   )
     .orFail(() => {
-      const err = new Error({ message: 'Карточка не найдена' });
-      err.statusCode = notFound;
-      err.name = 'NotFound';
-      throw err;
+      throw new NotFoundError('Карточка не найдена');
     })
     .then((card) => {
       res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(badRequest).send({ message: 'Переданы некорректные данные карточки' });
-        return;
+        next(new ValidationError('Переданы некорректные данныe'));
       }
-      if (err.name === 'NotFound') {
-        res.status(notFound).send({ message: err.message });
-        return;
-      }
-      res.status(serverError).send({ message: 'На сервере произошла ошибка' });
+      next(err);
     });
 };
 
