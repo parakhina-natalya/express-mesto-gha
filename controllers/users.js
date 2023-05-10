@@ -58,6 +58,14 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
+const getUsers = (req, res, next) => {
+  User.find()
+    .then((users) => {
+      res.send(users);
+    })
+    .catch(next);
+};
+
 const getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
     .orFail(() => {
@@ -65,20 +73,6 @@ const getUserInfo = (req, res, next) => {
     })
     .then((user) => {
       res.send(user);
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new ValidationError('Переданы некорректные данные'));
-      } else {
-        next(err);
-      }
-    });
-};
-
-const getUsers = (req, res, next) => {
-  User.find()
-    .then((users) => {
-      res.send(users);
     })
     .catch(next);
 };
@@ -91,19 +85,13 @@ const getUserById = (req, res, next) => {
     .then((user) => {
       res.send(user);
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new ValidationError('Переданы некорректные данные'));
-      } else {
-        next(err);
-      }
-    });
+    .catch(next);
 };
 
 const updateUserInfo = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, {
-    new: true, runValidators: true,
+    new: true,
   })
     .orFail(() => {
       throw new NotFoundError('Нет пользователя с таким id');
@@ -114,9 +102,6 @@ const updateUserInfo = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError('Переданы некорректные данные'));
-      }
-      if (err.name === 'CastError') {
-        next(new ValidationError('Переданы некорректные данныe'));
       } else {
         next(err);
       }
@@ -127,7 +112,7 @@ const updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(req.user._id, { avatar }, {
-    new: true, runValidators: true,
+    new: true,
   })
     .orFail(() => {
       throw new NotFoundError('Нет пользователя с таким id');
@@ -138,9 +123,6 @@ const updateUserAvatar = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError('Переданы некорректные данные'));
-      }
-      if (err.name === 'CastError') {
-        next(new ValidationError('Переданы некорректные данныe'));
       } else {
         next(err);
       }
