@@ -14,6 +14,7 @@ const auth = (req, res, next) => {
       payload = jwt.verify(token, 'super-strong-secret');
     } catch (err) {
       next(new UnauthorizedError('Необходима авторизация'));
+      return;
     }
 
     req.user = payload;

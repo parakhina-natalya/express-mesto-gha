@@ -15,8 +15,9 @@ const createCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError('Переданы некорректные данные при создании карточки'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -37,7 +38,7 @@ const removeCardById = (req, res, next) => {
       if (JSON.stringify(card.owner) !== JSON.stringify(req.user._id)) {
         throw new ForbiddenError('Нельзя удалять чужие карточки');
       } else {
-        Card.findByIdAndRemove(req.params.cardId)
+        Card.deleteOne(req.params.cardId)
           .then(() => {
             res.send({ message: 'Карточка удалена.' });
           })
@@ -47,8 +48,9 @@ const removeCardById = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new ValidationError('Переданы некорректные данныe'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -56,7 +58,7 @@ const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true, runValidators: true },
+    { new: true },
   )
     .orFail(() => {
       throw new NotFoundError('Карточка не найдена');
@@ -67,8 +69,9 @@ const likeCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new ValidationError('Переданы некорректные данныe'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -76,7 +79,7 @@ const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
-    { new: true, runValidators: true },
+    { new: true },
   )
     .orFail(() => {
       throw new NotFoundError('Карточка не найдена');
@@ -87,8 +90,9 @@ const dislikeCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new ValidationError('Переданы некорректные данныe'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
